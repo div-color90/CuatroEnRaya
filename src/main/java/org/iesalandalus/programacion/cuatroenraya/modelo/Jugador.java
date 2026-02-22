@@ -2,7 +2,7 @@ package org.iesalandalus.programacion.cuatroenraya.modelo;
 
 public record Jugador(String nombre, Ficha colorFichas) {
 
-    /* public Jugador(String nombre, Ficha colorFichas) {
+    /* Public Jugador(String nombre, Ficha colorFichas) {
         this.nombre = nombre;
         this.colorFichas = colorFichas;
     } */

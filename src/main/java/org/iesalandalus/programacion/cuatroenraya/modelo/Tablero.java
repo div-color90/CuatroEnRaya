@@ -35,7 +35,7 @@ public class Tablero {
     public boolean estaVacio() {
         //declarar la variable vacío
         boolean tableroVacio = true;//de momento asumimos de que está vacío
-        for (int j = 0; j < COLUMNAS; j++) {
+        for (int j = 0; j < COLUMNAS ; j++) {
             if (!columnaVacia(j)) {
                 tableroVacio = false;
             }
@@ -78,7 +78,7 @@ public class Tablero {
         }
         return -1;
     }
-    private boolean objetoAlcanzado(int fichasIgualesConsecutivas) {
+    private boolean objetivoAlcanzado(int fichasIgualesConsecutivas) {
         return fichasIgualesConsecutivas >= FICHAS_IGUALES_CONSECUTIVAS_NECESARIAS;
     }
     public boolean introducirFicha(int columna, Ficha ficha) throws CuatroEnRayaExcepcion {
@@ -97,34 +97,37 @@ public class Tablero {
         return ganadora;
     }
     private boolean comprobarHorizontal(int fila, Ficha ficha) {
-     int contador = 0;
-     boolean hayCuatro = false;
-     for(int j = 0; j < COLUMNAS; j++){
-         if(casillas[fila][j].getFicha() == ficha){
-             contador ++;
-             if (contador == 4){
-               hayCuatro = true;
-             }
-         }else {
-             contador = 0;
-         }
-     }
-     return hayCuatro;
-    }
-    private boolean comprobarVertical(int columna, Ficha ficha) {
         int contador = 0;
-        boolean hayCuatro = false;
-        for(int i = 0; i < FILAS; i++){
-            if(casillas[i][columna].getFicha() == ficha){
-                contador ++;
-                if (contador == 4){
-                    hayCuatro = true;
+        boolean resultado = false;
+        for (int j = 0; j < COLUMNAS && !resultado; j++) {
+            if (casillas[fila][j].getFicha() == ficha) {
+                contador++;
+                // Usamos el método de utilidad aquí
+                if (objetivoAlcanzado(contador)) {
+                    resultado = true;
                 }
-            }else {
+            } else {
                 contador = 0;
             }
         }
-        return hayCuatro;
+        return resultado;
+    }
+    private boolean comprobarVertical(int columna, Ficha ficha) {
+        int contador = 0;
+        boolean resultado = false;
+
+        for (int i = 0; i < FILAS && !resultado; i++) {
+            if (casillas[i][columna].getFicha() == ficha) {
+                contador++;
+                // Usamos el método de utilidad aquí
+                if (objetivoAlcanzado(contador)) {
+                    resultado = true;
+                }
+            } else {
+                contador = 0;
+            }
+        }
+        return resultado;
     }
     private int menor(int fila, int columna) {
         return  (fila < columna) ? fila : columna;
@@ -132,44 +135,46 @@ public class Tablero {
     //si fila < columna devuelve fila, si no devuelve columna.
 
     private boolean comprobarDiagonalINE(int filaActual, int columnaActual, Ficha ficha) {
+        int fichasIgualesConsecutivas = 0;
         int desplazamiento = menor(filaActual, columnaActual);
-        int fila = filaActual - desplazamiento;
-        int columna = columnaActual - desplazamiento;
-        int contador = 0;
-        boolean hayCuatro = false;
-        while(fila < FILAS && columna < COLUMNAS){
-            if(casillas[fila][columna].estaOcupada() && casillas[fila][columna].getFicha() == ficha){
-                contador ++;
-                if (contador == 4){
-                    hayCuatro = true;
-                }
-            }else {
-                contador = 0;
+        int filaInicial = filaActual - desplazamiento;
+        int columnaInicial = columnaActual - desplazamiento;
+
+        // Inicializamos fila y columna, y el bucle corre mientras no se alcance el objetivo
+        // y estemos dentro de los límites del tablero.
+        for (int fila = filaInicial, columna = columnaInicial;
+             !objetivoAlcanzado(fichasIgualesConsecutivas) && (fila < FILAS && columna < COLUMNAS);
+             fila++, columna++) {
+
+            if (casillas[fila][columna].estaOcupada() && casillas[fila][columna].getFicha().equals(ficha)) {
+                fichasIgualesConsecutivas++;
+            } else {
+                fichasIgualesConsecutivas = 0;
             }
-            fila++;
-            columna++;
         }
-        return hayCuatro;
+
+        // Un único punto de salida que evalúa el resultado final
+        return objetivoAlcanzado(fichasIgualesConsecutivas);
     }
     private boolean comprobarDiagonalINO(int filaActual, int columnaActual, Ficha ficha) {
+        int fichasIgualesConsecutivas = 0;
         int desplazamiento = menor(filaActual, COLUMNAS - 1 - columnaActual);
-        int fila = filaActual - desplazamiento;
-        int columna = columnaActual + desplazamiento;
-        int contador = 0;
-        boolean hayCuatro = false;
-        while(fila < FILAS && columna >= 0){
-            if(casillas[fila][columna].estaOcupada() && casillas[fila][columna].getFicha() == ficha){
-                contador ++;
-                if (contador == 4){
-                    hayCuatro = true;
-                }
-            }else {
-                contador = 0;
+        int filaInicial = filaActual - desplazamiento;
+        int columnaInicial = columnaActual + desplazamiento;
+
+        // El bucle se ejecuta mientras no se alcance el objetivo Y estemos dentro de los límites
+        for (int fila = filaInicial, columna = columnaInicial;
+             !objetivoAlcanzado(fichasIgualesConsecutivas) && (fila < FILAS && columna >= 0);
+             fila++, columna--) {
+
+            if (casillas[fila][columna].estaOcupada() && casillas[fila][columna].getFicha().equals(ficha)) {
+                fichasIgualesConsecutivas++;
+            } else {
+                fichasIgualesConsecutivas = 0;
             }
-            fila++;
-            columna--;
         }
-        return hayCuatro;
+
+        return objetivoAlcanzado(fichasIgualesConsecutivas);
     }
     private boolean comprobarTirada(int fila, int columna, Ficha ficha) {
         boolean ganadora = false;

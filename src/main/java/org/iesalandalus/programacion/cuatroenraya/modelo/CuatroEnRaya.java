@@ -37,21 +37,19 @@ public class CuatroEnRaya {
     }
     private boolean tirar(Jugador jugador) {
         boolean jugadaGanadora = false;
-        boolean fichaColocada = false;
+        boolean jugadaValida = false;
 
         // Repetir el proceso mientras no se introduzca una ficha correctamente
         do {
             try {
-                int columna = Consola.leerColumna(jugador);
-                jugadaGanadora = tablero.introducirFicha(columna, jugador.colorFichas());
-
-                fichaColocada = true;
-
-            } catch (Exception e) {
+                jugadaGanadora = tablero.introducirFicha(Consola.leerColumna(jugador), jugador.colorFichas());
+                System.out.printf("%n%s%n", tablero);
+                jugadaValida = true;
+            } catch (CuatroEnRayaExcepcion e) {
                 System.out.println(e.getMessage());
-                System.out.println("Por favor, elige otra columna.");
+                System.out.println(e.getMessage());
             }
-        } while (!fichaColocada);
+        } while (!jugadaValida);
 
         return jugadaGanadora;
     }
